@@ -76,7 +76,6 @@ export default function Home() {
         id="vehicules"
         className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(74,104,174,0.42),transparent_28%),radial-gradient(circle_at_70%_20%,rgba(25,49,100,0.32),transparent_24%),linear-gradient(180deg,rgba(5,10,20,0.94),rgba(9,19,35,0.98))]" />
 
         <div className="relative z-10 mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
           <div className="max-w-2xl">
