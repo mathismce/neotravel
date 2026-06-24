@@ -201,6 +201,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <footer className="relative border-t border-white/10 bg-[#08111f] px-4 py-8 text-center sm:px-6 lg:px-8">
+        <p className="text-sm font-medium uppercase tracking-[0.22em] text-white/50">
+          À définir
+        </p>
+      </footer>
     </main>
   );
 }
