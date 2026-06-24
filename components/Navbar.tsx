@@ -21,6 +21,9 @@ export default function Navbar() {
           <a href="#vehicules" className="transition-colors hover:text-white">
             Nos Véhicules
           </a>
+          <a href="#qui-sommes-nous" className="transition-colors hover:text-white">
+  Qui sommes-nous
+</a>
           <a href="#avis" className="transition-colors hover:text-white">
             Avis
           </a>
