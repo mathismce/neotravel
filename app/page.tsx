@@ -76,7 +76,6 @@ export default function Home() {
         id="vehicules"
         className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(74,104,174,0.42),transparent_28%),radial-gradient(circle_at_70%_20%,rgba(25,49,100,0.32),transparent_24%),linear-gradient(180deg,rgba(5,10,20,0.94),rgba(9,19,35,0.98))]" />
 
         <div className="relative z-10 mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
           <div className="max-w-2xl">
@@ -129,78 +128,262 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        id="tarifs"
-        className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
-      >
-        <div className="mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-[#f7f4ec] p-6 shadow-[0_25px_70px_rgba(0,0,0,0.22)] sm:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-lime-700/80">
-            Tarifs
-          </p>
-          <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] text-zinc-950 sm:text-4xl">
-            Des prix lisibles et adaptés à ton trajet.
-          </h2>
+<section
+  id="qui-sommes-nous"
+  className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
+>
+  <div className="relative z-10 mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
+    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-lime-200/80">
+      Qui sommes-nous
+    </p>
+    <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] sm:text-4xl">
+      Un intermédiaire de confiance pour vos trajets en groupe.
+    </h2>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            <article className="rounded-3xl border border-slate-200 bg-white p-6">
-              <h3 className="text-xl font-bold text-zinc-950">à definir</h3>
-              <p className="mt-2 text-sm text-slate-500"></p>
-              <p className="mt-6 text-4xl font-black text-zinc-950"></p>
-            </article>
-            <article className="rounded-3xl border border-lime-300 bg-lime-50 p-6 ring-1 ring-lime-200">
-              <h3 className="text-xl font-bold text-zinc-950">à definir</h3>
-              <p className="mt-2 text-sm text-slate-600">.</p>
-              <p className="mt-6 text-4xl font-black text-zinc-950"></p>
-            </article>
-            <article className="rounded-3xl border border-slate-200 bg-white p-6">
-              <h3 className="text-xl font-bold text-zinc-950">à definir</h3>
-              <p className="mt-2 text-sm text-slate-500"></p>
-              <p className="mt-6 text-4xl font-black text-zinc-950"></p>
-            </article>
+    <div className="mt-8 grid gap-8 md:grid-cols-2">
+      <p className="text-base leading-8 text-white/70">
+        Neotravel est né d'un constat simple : organiser un trajet en groupe ne devrait pas être une source de stress. Trop souvent, les entreprises, associations et établissements scolaires perdent un temps précieux à comparer des prestataires, négocier des tarifs et coordonner des devis incomplets. Nous avons décidé de changer ça.
+      </p>
+      <p className="text-base leading-8 text-white/70">
+        En tant qu'intermédiaire spécialisé dans le transport collectif par autocar, nous mettons en relation nos clients avec un réseau de transporteurs fiables et sélectionnés. Notre rôle : simplifier chaque étape, de la demande de devis jusqu'à la confirmation de réservation, grâce à un processus entièrement digitalisé et piloté par l'intelligence artificielle.
+      </p>
+    </div>
+
+    <div className="mt-10 grid gap-4 sm:grid-cols-3">
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+        <p className="text-sm uppercase tracking-[0.2em] text-white/40">Notre mission</p>
+        <p className="mt-3 text-base leading-7 text-white/80">
+          Rendre le transport de groupe accessible, transparent et sans friction pour tous nos clients.
+        </p>
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+        <p className="text-sm uppercase tracking-[0.2em] text-white/40">Notre approche</p>
+        <p className="mt-3 text-base leading-7 text-white/80">
+          Un assistant IA qualifie votre besoin, génère un devis sur-mesure et déclenche un suivi automatisé, sans vous faire attendre.
+        </p>
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+        <p className="text-sm uppercase tracking-[0.2em] text-white/40">Notre engagement</p>
+        <p className="mt-3 text-base leading-7 text-white/80">
+          Réponse sous 2 heures, devis personnalisé et accompagnement humain disponible du lundi au samedi.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+      <section
+  
+  id="avis"
+  className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
+>
+  <div className="relative z-10 mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
+
+    <div className="flex items-start justify-between gap-6 flex-wrap">
+      <div>
+        <span className="inline-flex items-center gap-2 rounded-full border border-lime-300/40 bg-lime-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-lime-300">
+          <span className="h-1.5 w-1.5 rounded-full bg-lime-400" />
+          Avis certifiés
+        </span>
+        <h2 className="mt-4 text-3xl font-black tracking-[-0.03em] sm:text-4xl">
+          Ils nous ont fait confiance
+        </h2>
+      </div>
+
+      <div className="rounded-2xl border border-white/10 bg-black/20 px-6 py-4 text-right">
+        <p className="text-4xl font-black text-lime-300">5/5</p>
+        <p className="mt-1 text-sm text-white/60">6 avis vérifiés</p>
+        <p className="text-sm text-white/60">Trusted Shops</p>
+        <a href="#" className="mt-2 block text-sm text-white/40 underline underline-offset-2 hover:text-white/70 transition-colors">
+          Voir la source externe
+        </a>
+      </div>
+    </div>
+
+    <div className="mt-10 grid gap-4 md:grid-cols-3">
+      <article className="rounded-2xl border border-white/10 bg-black/20 p-6">
+        <div className="inline-flex items-center gap-0.5 rounded-full border border-lime-300/30 bg-lime-300/10 px-3 py-1">
+          {"★★★★★".split("").map((s, i) => (
+            <span key={i} className="text-lime-300 text-sm">{s}</span>
+          ))}
+        </div>
+        <p className="mt-5 text-sm italic leading-6 text-white/80">
+          Service impeccable, chauffeur ponctuel et véhicule très confortable. Je recommande sans hésiter.
+        </p>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/40">
+          - Sophie M., Directrice RH
+        </p>
+      </article>
+
+      <article className="rounded-2xl border border-white/10 bg-black/20 p-6">
+        <div className="inline-flex items-center gap-0.5 rounded-full border border-lime-300/30 bg-lime-300/10 px-3 py-1">
+          {"★★★★★".split("").map((s, i) => (
+            <span key={i} className="text-lime-300 text-sm">{s}</span>
+          ))}
+        </div>
+        <p className="mt-5 text-sm italic leading-6 text-white/80">
+          Rapport qualité-prix imbattable pour notre voyage de fin d'année. Toute l'équipe était ravie.
+        </p>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/40">
+          - Lucas B., BDE Sciences Po
+        </p>
+      </article>
+
+      <article className="rounded-2xl border border-white/10 bg-black/20 p-6">
+        <div className="inline-flex items-center gap-0.5 rounded-full border border-lime-300/30 bg-lime-300/10 px-3 py-1">
+          {"★★★★★".split("").map((s, i) => (
+            <span key={i} className="text-lime-300 text-sm">{s}</span>
+          ))}
+        </div>
+        <p className="mt-5 text-sm italic leading-6 text-white/80">
+          Dix ans de collaboration sans une seule mauvaise surprise. Un partenaire de confiance pour nos déplacements professionnels.
+        </p>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/40">
+          - François D., Association Nationale
+        </p>
+      </article>
+    </div>
+
+  </div>
+</section>
+
+      <section
+  id="faq"
+  className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
+>
+  <div className="mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
+    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-lime-200/80">
+      FAQ
+    </p>
+    <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] sm:text-4xl">
+      Les réponses aux questions les plus fréquentes.
+    </h2>
+
+    <div className="mt-8 space-y-4">
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Combien de temps pour recevoir une estimation ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          Une fois votre demande soumise via le formulaire, notre système génère une première estimation en temps réel. Un conseiller valide ensuite le devis et vous le transmet par e-mail sous 2 heures ouvrées, du lundi au samedi. Pour les demandes complexes (groupes importants, trajets sur plusieurs jours), un rappel téléphonique peut être organisé.
+        </p>
+      </details>
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Peut-on réserver pour plusieurs passagers ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          Oui, absolument. Nous disposons de véhicules adaptés à toutes les tailles de groupe : voiture confort jusqu'à 4 passagers, van jusqu'à 8 passagers avec bagages, et bus pour les groupes plus importants. Que ce soit pour une sortie scolaire, un séminaire d'entreprise ou un transfert collectif, nous dimensionnons la flotte à votre besoin.
+        </p>
+      </details>
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Les tarifs sont-ils fixes ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          Nous ne pratiquons pas de tarification à la course fixe. Chaque devis est calculé selon votre trajet, le nombre de passagers, le véhicule souhaité et les éventuelles options (prise en charge à domicile, attente sur place, retour inclus). Cette approche nous permet de vous proposer un prix juste, sans mauvaise surprise.
+        </p>
+      </details>
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Comment fonctionne le processus de réservation ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          C'est simple et rapide : renseignez vos informations dans le formulaire, notre assistant IA qualifie votre demande en vous posant quelques questions sur votre trajet, puis génère un devis personnalisé. Vous recevez ce devis par e-mail, le validez en ligne, et la réservation est confirmée. Aucun appel téléphonique nécessaire.
+        </p>
+      </details>
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Quels types de trajets prenez-vous en charge ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          Nous couvrons une large gamme de besoins : transferts aéroport et gare, trajets domicile-travail réguliers, sorties scolaires et périscolaires, déplacements professionnels et séminaires d'entreprise, ainsi que les longs trajets interrégionaux. Si vous avez un besoin spécifique, n'hésitez pas à nous le soumettre via le formulaire.
+        </p>
+      </details>
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Peut-on réserver à la dernière minute ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          Nous acceptons les demandes jusqu'à 3 heures avant le départ, sous réserve de disponibilité. Pour garantir votre créneau et le véhicule de votre choix, nous recommandons de réserver au minimum 24 heures à l'avance. Pour les groupes ou événements, un délai de 48 à 72 heures est conseillé.
+        </p>
+      </details>
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Quelles sont les conditions d'annulation ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          Toute annulation effectuée plus de 24 heures avant le départ est gratuite et intégralement remboursée. En deçà de ce délai, des frais d'annulation peuvent s'appliquer selon les conditions du trajet. En cas de force majeure, contactez-nous directement : nous étudions chaque situation au cas par cas.
+        </p>
+      </details>
+      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+        <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
+          Les chauffeurs parlent-ils plusieurs langues ?
+        </summary>
+        <p className="mt-3 text-sm leading-6 text-white/70">
+          Nos chauffeurs sont francophones et la plupart maîtrisent l'anglais pour les trajets avec des passagers internationaux. Si vous avez besoin d'un accompagnement dans une autre langue, signalez-le dans votre demande et nous ferons notre possible pour y répondre.
+        </p>
+      </details>
+    </div>
+  </div>
+</section>
+<footer className="relative border-t border-white/10 px-4 py-12 text-white sm:px-6 lg:px-8">
+  <div className="mx-auto w-full max-w-6xl">
+    
+    <div className="grid gap-8 sm:grid-cols-3">
+      <div>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-xs font-black tracking-[0.22em] text-lime-200">
+            NT
+          </div>
+          <div className="leading-tight">
+            <span className="block text-sm font-semibold uppercase tracking-[0.26em] text-white/90">
+              NeoTravel
+            </span>
+            <span className="block text-xs text-white/50">Estimation de trajet</span>
           </div>
         </div>
-      </section>
+        <p className="mt-4 text-sm leading-6 text-white/50">
+          L'intermédiaire digital pour vos trajets en groupe. Devis personnalisé, réponse rapide, zéro friction.
+        </p>
+      </div>
 
-      <section
-        id="faq"
-        className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
-      >
-        <div className="mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-lime-200/80">
-            FAQ
-          </p>
-          <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] sm:text-4xl">
-            Les réponses aux questions les plus fréquentes.
-          </h2>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/40">Navigation</p>
+        <ul className="mt-4 space-y-2">
+          <li><a href="#form" className="text-sm text-white/60 hover:text-white transition-colors">Réserver un trajet</a></li>
+          <li><a href="#vehicules" className="text-sm text-white/60 hover:text-white transition-colors">Nos véhicules</a></li>
+          <li><a href="#qui-sommes-nous" className="text-sm text-white/60 hover:text-white transition-colors">Qui sommes-nous</a></li>
+          <li><a href="#avis" className="text-sm text-white/60 hover:text-white transition-colors">Avis clients</a></li>
+          <li><a href="#faq" className="text-sm text-white/60 hover:text-white transition-colors">FAQ</a></li>
+        </ul>
+      </div>
 
-          <div className="mt-8 space-y-4">
-            <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
-              <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
-                Combien de temps pour recevoir une estimation ?
-              </summary>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                La réponse est généralement envoyée sous 2 heures ouvrées, du lundi au samedi.
-              </p>
-            </details>
-            <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
-              <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
-                Peut-on réserver pour plusieurs passagers ?
-              </summary>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                Oui, les véhicules Van et VIP sont adaptés aux groupes et aux transferts avec bagages.
-              </p>
-            </details>
-            <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
-              <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
-                Les tarifs sont-ils fixes ?
-              </summary>
-              <p className="mt-3 text-sm leading-6 text-white/70">
-                Les prix indiqués servent de repères. Le devis final dépend surtout du trajet, de l’horaire et du véhicule choisi.
-              </p>
-            </details>
-          </div>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/40">Contact</p>
+        <ul className="mt-4 space-y-2">
+          <li><a href="mailto:contact@neotravel.fr" className="text-sm text-white/60 hover:text-white transition-colors">contact@neotravel.fr</a></li>
+          <li><span className="text-sm text-white/60">Lun – Sam, 9h – 19h</span></li>
+        </ul>
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-white/40">Suivez-nous</p>
+        <div className="mt-3 flex gap-3">
+          <a href="#" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60 hover:text-white transition-colors">LinkedIn</a>
+          <a href="#" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60 hover:text-white transition-colors">Instagram</a>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
+
+    <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6">
+      <p className="text-xs text-white/30">© 2025 Neotravel. Tous droits réservés.</p>
+      <div className="flex gap-6">
+        <a href="#" className="text-xs text-white/30 hover:text-white/60 transition-colors">Mentions légales</a>
+        <a href="#" className="text-xs text-white/30 hover:text-white/60 transition-colors">Politique de confidentialité</a>
+        <a href="#" className="text-xs text-white/30 hover:text-white/60 transition-colors">CGU</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+</main>
   );
 }
