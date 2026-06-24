@@ -29,7 +29,13 @@ export default function Home() {
             </p>
           </div>
 
-          <form id="form" className="mx-auto mt-8 max-w-[560px] space-y-4 sm:mt-7">
+          <form
+            id="form"
+            action="/chatbot"
+            method="get"
+            target="_blank"
+            className="mx-auto mt-8 max-w-[560px] space-y-4 sm:mt-7"
+          >
             <input
               type="text"
               name="name"
