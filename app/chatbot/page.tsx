@@ -23,14 +23,14 @@ export default function ChatbotPage() {
     return [
       {
         id: 1,
-        role: "assistant",
+        role: "assistant" as const,
         text: "Bonjour, je suis l'assistant NeoTravel. Décrivez votre trajet et je vous aide à qualifier votre demande.",
       },
       ...(collected
         ? [
             {
               id: 2,
-              role: "assistant",
+              role: "assistant" as const,
               text: `Merci. J'ai bien reçu vos informations (${collected}). Quel est votre point de départ ?`,
             },
           ]
@@ -47,17 +47,11 @@ export default function ChatbotPage() {
     event.preventDefault();
 
     const trimmed = input.trim();
-    if (!trimmed) {
-      return;
-    }
+    if (!trimmed) return;
 
     setMessages((currentMessages) => [
       ...currentMessages,
-      {
-        id: Date.now(),
-        role: "user",
-        text: trimmed,
-      },
+      { id: Date.now(), role: "user", text: trimmed },
     ]);
     setInput("");
 
@@ -66,7 +60,7 @@ export default function ChatbotPage() {
         ...currentMessages,
         {
           id: Date.now() + 1,
-          role: "assistant",
+          role: "assistant" as const,
           text: "Merci. Précisez maintenant la ville de départ, la destination et le nombre de passagers pour continuer l'échange.",
         },
       ]);
@@ -79,6 +73,8 @@ export default function ChatbotPage() {
 
       <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-5xl items-center justify-center">
         <section className="flex h-[calc(100vh-5rem)] w-full flex-col overflow-hidden rounded-[36px] border border-white/12 bg-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.3)] backdrop-blur-md">
+          
+          {/* Header */}
           <header className="border-b border-white/10 px-6 py-5 sm:px-8">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-lime-200/80">
               Assistant NeoTravel
@@ -89,8 +85,29 @@ export default function ChatbotPage() {
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/68 sm:text-base">
               Parlez directement à l&apos;assistant. Il collecte les informations de votre trajet au fil de la conversation.
             </p>
+
+            {/* 4 encadrés */}
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">Départ</p>
+                <p className="mt-1 text-sm font-semibold text-white/30">...</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">Destination</p>
+                <p className="mt-1 text-sm font-semibold text-white/30">...</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">Passagers</p>
+                <p className="mt-1 text-sm font-semibold text-white/30">...</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">Durée</p>
+                <p className="mt-1 text-sm font-semibold text-white/30">...</p>
+              </div>
+            </div>
           </header>
 
+          {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-8">
             <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
               {messages.map((message) => (
@@ -113,6 +130,7 @@ export default function ChatbotPage() {
             </div>
           </div>
 
+          {/* Input */}
           <div className="border-t border-white/10 p-4 sm:p-6">
             <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-3xl items-end gap-3">
               <div className="flex-1">
@@ -136,6 +154,7 @@ export default function ChatbotPage() {
               </button>
             </form>
           </div>
+
         </section>
       </div>
     </main>
