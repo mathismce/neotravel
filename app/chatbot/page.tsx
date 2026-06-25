@@ -132,8 +132,7 @@ export default function ChatbotPage() {
 
           {/* Input */}
           <div className="border-t border-white/10 p-4 sm:p-6">
-            <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-3xl items-end gap-3">
-              <div className="flex-1">
+<form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-3xl items-center gap-3">              <div className="flex-1">
                 <label htmlFor="chat-input" className="sr-only">
                   Votre message
                 </label>
