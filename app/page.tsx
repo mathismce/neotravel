@@ -343,6 +343,7 @@ export default function Home() {
             <span className="block text-xs text-white/50">Estimation de trajet</span>
           </div>
         </div>
+
         <p className="mt-4 text-sm leading-6 text-white/50">
           L'intermédiaire digital pour vos trajets en groupe. Devis personnalisé, réponse rapide, zéro friction.
         </p>
@@ -385,5 +386,6 @@ export default function Home() {
   </div>
 </footer>
 </main>
+
   );
 }
