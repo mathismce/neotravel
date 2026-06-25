@@ -130,9 +130,11 @@ export default function Home() {
 
 <section
   id="qui-sommes-nous"
-  className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
+className="relative flex items-center px-4 py-0 sm:px-6 lg:px-8"
 >
-  <div className="relative z-10 mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
+  <div className="relative z-10 mx-auto w-full max-w-6xl text-white">
+    <div className="border-t border-white/20 w-3/4 mx-auto mb-16" />
+
     <p className="text-sm font-semibold uppercase tracking-[0.24em] text-lime-200/80">
       Qui sommes-nous
     </p>
@@ -150,25 +152,27 @@ export default function Home() {
     </div>
 
     <div className="mt-10 grid gap-4 sm:grid-cols-3">
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+      <div className="rounded-2xl border border-white/10 bg-white/10 p-6">
         <p className="text-sm uppercase tracking-[0.2em] text-white/40">Notre mission</p>
         <p className="mt-3 text-base leading-7 text-white/80">
           Rendre le transport de groupe accessible, transparent et sans friction pour tous nos clients.
         </p>
       </div>
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+      <div className="rounded-2xl border border-white/10 bg-white/10 p-6">
         <p className="text-sm uppercase tracking-[0.2em] text-white/40">Notre approche</p>
         <p className="mt-3 text-base leading-7 text-white/80">
           Un assistant IA qualifie votre besoin, génère un devis sur-mesure et déclenche un suivi automatisé, sans vous faire attendre.
         </p>
       </div>
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+      <div className="rounded-2xl border border-white/10 bg-white/10 p-6">
         <p className="text-sm uppercase tracking-[0.2em] text-white/40">Notre engagement</p>
         <p className="mt-3 text-base leading-7 text-white/80">
           Réponse sous 2 heures, devis personnalisé et accompagnement humain disponible du lundi au samedi.
         </p>
       </div>
     </div>
+
+    <div className="border-b border-white/20 w-3/4 mx-auto mt-16" />
   </div>
 </section>
 
@@ -249,9 +253,11 @@ export default function Home() {
 
       <section
   id="faq"
-  className="relative flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8"
+  className="relative flex items-center px-4 py-16 sm:px-6 lg:px-8"
 >
-  <div className="mx-auto w-full max-w-6xl rounded-[32px] border border-white/12 bg-white/10 p-6 text-white shadow-[0_25px_70px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-8">
+  <div className="relative z-10 mx-auto w-full max-w-6xl text-white">
+    <div className="border-t border-white/20 w-3/4 mx-auto mb-16" />
+
     <p className="text-sm font-semibold uppercase tracking-[0.24em] text-lime-200/80">
       FAQ
     </p>
@@ -260,7 +266,7 @@ export default function Home() {
     </h2>
 
     <div className="mt-8 space-y-4">
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Combien de temps pour recevoir une estimation ?
         </summary>
@@ -268,7 +274,7 @@ export default function Home() {
           Une fois votre demande soumise via le formulaire, notre système génère une première estimation en temps réel. Un conseiller valide ensuite le devis et vous le transmet par e-mail sous 2 heures ouvrées, du lundi au samedi. Pour les demandes complexes (groupes importants, trajets sur plusieurs jours), un rappel téléphonique peut être organisé.
         </p>
       </details>
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Peut-on réserver pour plusieurs passagers ?
         </summary>
@@ -276,7 +282,7 @@ export default function Home() {
           Oui, absolument. Nous disposons de véhicules adaptés à toutes les tailles de groupe : voiture confort jusqu'à 4 passagers, van jusqu'à 8 passagers avec bagages, et bus pour les groupes plus importants. Que ce soit pour une sortie scolaire, un séminaire d'entreprise ou un transfert collectif, nous dimensionnons la flotte à votre besoin.
         </p>
       </details>
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Les tarifs sont-ils fixes ?
         </summary>
@@ -284,7 +290,7 @@ export default function Home() {
           Nous ne pratiquons pas de tarification à la course fixe. Chaque devis est calculé selon votre trajet, le nombre de passagers, le véhicule souhaité et les éventuelles options (prise en charge à domicile, attente sur place, retour inclus). Cette approche nous permet de vous proposer un prix juste, sans mauvaise surprise.
         </p>
       </details>
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Comment fonctionne le processus de réservation ?
         </summary>
@@ -292,7 +298,7 @@ export default function Home() {
           C'est simple et rapide : renseignez vos informations dans le formulaire, notre assistant IA qualifie votre demande en vous posant quelques questions sur votre trajet, puis génère un devis personnalisé. Vous recevez ce devis par e-mail, le validez en ligne, et la réservation est confirmée. Aucun appel téléphonique nécessaire.
         </p>
       </details>
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Quels types de trajets prenez-vous en charge ?
         </summary>
@@ -300,7 +306,7 @@ export default function Home() {
           Nous couvrons une large gamme de besoins : transferts aéroport et gare, trajets domicile-travail réguliers, sorties scolaires et périscolaires, déplacements professionnels et séminaires d'entreprise, ainsi que les longs trajets interrégionaux. Si vous avez un besoin spécifique, n'hésitez pas à nous le soumettre via le formulaire.
         </p>
       </details>
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Peut-on réserver à la dernière minute ?
         </summary>
@@ -308,7 +314,7 @@ export default function Home() {
           Nous acceptons les demandes jusqu'à 3 heures avant le départ, sous réserve de disponibilité. Pour garantir votre créneau et le véhicule de votre choix, nous recommandons de réserver au minimum 24 heures à l'avance. Pour les groupes ou événements, un délai de 48 à 72 heures est conseillé.
         </p>
       </details>
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Quelles sont les conditions d'annulation ?
         </summary>
@@ -316,7 +322,7 @@ export default function Home() {
           Toute annulation effectuée plus de 24 heures avant le départ est gratuite et intégralement remboursée. En deçà de ce délai, des frais d'annulation peuvent s'appliquer selon les conditions du trajet. En cas de force majeure, contactez-nous directement : nous étudions chaque situation au cas par cas.
         </p>
       </details>
-      <details className="group rounded-2xl border border-white/10 bg-black/20 p-5">
+      <details className="group rounded-2xl border border-white/10 bg-white/10 p-5">
         <summary className="cursor-pointer list-none text-lg font-semibold outline-none">
           Les chauffeurs parlent-ils plusieurs langues ?
         </summary>
