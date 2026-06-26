@@ -6,6 +6,11 @@ export interface DevisInput {
   nbPassagers: number;
   dateDepart: Date;
   dateDemande: Date;
+   options?: {
+     guide?: { nbJours: number };
+     nuitChauffeur?: { nbNuits: number };
+     peages?: number;  // forfait selon trajet — montant fixe
+  };
 }
 
 export interface DevisOutput {
@@ -14,6 +19,12 @@ export interface DevisOutput {
   coeffDateValue: number;
   coeffCapaciteValue: number;
   margeValue: number;
+  supplements: {
+     guide: number;
+     nuitChauffeur: number;
+     peages: number;
+     total: number;
+  };
   totalHT: number;
   totalTTC: number;
 }
@@ -96,11 +107,17 @@ export function calculerDevis(input: DevisInput): DevisOutput {
   const totalCoeffs = 1 + coeffSaison + coeffDate + coeffCapacite;
   const tarifAjuste = tarifBase * totalCoeffs;
 
+  const supGuide       = (input.options?.guide?.nbJours ?? 0) * 80
+  const supNuit        = (input.options?.nuitChauffeur?.nbNuits ?? 0) * 120
+  const supPeages      = input.options?.peages ?? 0
+  const totalSupplements = supGuide + supNuit + supPeages
+
   const margeMetiere = 0.15;
-  const totalHT = tarifAjuste * (1 + margeMetiere);
+  const totalHTAvecSup = tarifAjuste + totalSupplements
+  const totalHT = totalHTAvecSup * (1 + margeMetiere);
 
   const tvaTaux = 0.10;
-  const totalTTC = totalHT * (1 + tvaTaux);
+  const totalTTC = totalHT* (1 + tvaTaux);
 
   return {
     tarifBase,
@@ -108,6 +125,12 @@ export function calculerDevis(input: DevisInput): DevisOutput {
     coeffDateValue: coeffDate,
     coeffCapaciteValue: coeffCapacite,
     margeValue: margeMetiere,
+    supplements: {
+      guide:        supGuide,
+      nuitChauffeur: supNuit,
+      peages:       supPeages,
+      total:        totalSupplements
+    },
     totalHT: Math.round(totalHT * 100) / 100,
     totalTTC: Math.round(totalTTC * 100) / 100
   };

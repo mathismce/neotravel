@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 export const tools = {
 
-  // ─── OUTIL 1 — Calculer le devis ──────────────────────────────
+  // OUTIL 1 — Calculer le devis
   calculer_devis: tool({
     description: `
       Calcule le prix d'un transfert de manière déterministe.
@@ -18,7 +18,11 @@ export const tools = {
       date_depart:   z.string().describe('Date de départ (YYYY-MM-DD)'),
       date_demande:  z.string().describe("Date d'aujourd'hui (YYYY-MM-DD)"),
       type_vehicule: z.string().describe('berline, van ou bus'),
-      options:       z.array(z.string()).describe('Ex: ["guide", "nuit_chauffeur"]'),
+      options: z.object({
+         guide:         z.object({ nbJours: z.number() }).optional(),
+         nuitChauffeur: z.object({ nbNuits: z.number() }).optional(),
+         peages:        z.number().optional(),
+      }).optional(),
     }),
     execute: async ({ distance_km, nb_passagers, date_depart, date_demande, type_vehicule, options }) => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/devis`, {
@@ -30,7 +34,7 @@ export const tools = {
     },
   }),
 
-  // ─── OUTIL 2 — Enregistrer la demande ─────────────────────────
+  //  OUTIL 2 — Enregistrer la demande 
   enregistrer_demande: tool({
     description: `
       Enregistre les informations du prospect dans Supabase.
@@ -58,7 +62,7 @@ export const tools = {
     },
   }),
 
-  // ─── OUTIL 3 — Escalader vers un humain ───────────────────────
+  //  OUTIL 3 — Escalader vers un humain 
   escalader_humain: tool({
     description: `
       À appeler quand la demande est hors périmètre ou incohérente.
