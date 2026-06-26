@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "../../components/Navbar";
 
-export default function RdvPage() {
+function RdvContent() {
   const searchParams = useSearchParams();
   const demandeId = searchParams.get("demande_id");
 
@@ -174,5 +174,13 @@ export default function RdvPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function RdvPage() {
+  return (
+    <Suspense fallback={null}>
+      <RdvContent />
+    </Suspense>
   );
 }
