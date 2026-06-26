@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 type Message = {
@@ -9,7 +9,7 @@ type Message = {
   text: string;
 };
 
-export default function ChatbotPage() {
+function ChatbotContent() {
   const searchParams = useSearchParams();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -139,5 +139,13 @@ export default function ChatbotPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function ChatbotPage() {
+  return (
+    <Suspense fallback={null}>
+      <ChatbotContent />
+    </Suspense>
   );
 }
