@@ -23,14 +23,14 @@ export default function ChatbotPage() {
     return [
       {
         id: 1,
-        role: "assistant",
+        role: "assistant" as const,
         text: "Bonjour, je suis l'assistant NeoTravel. Décrivez votre trajet et je vous aide à qualifier votre demande.",
       },
       ...(collected
         ? [
             {
               id: 2,
-              role: "assistant",
+              role: "assistant" as const,
               text: `Merci. J'ai bien reçu vos informations (${collected}). Quel est votre point de départ ?`,
             },
           ]
