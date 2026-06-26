@@ -16,6 +16,19 @@ type DemandeRow = {
   created_at: string | null;
 };
 
+type RdvRow = {
+  demande_id: string;
+  date_rdv: string | null;
+  canal: string | null;
+  statut: string | null;
+};
+
+type LeadRdv = {
+  date: string;
+  canal: string;
+  statut: string;
+};
+
 type LeadPayload = {
   id: string;
   name: string;
@@ -28,6 +41,7 @@ type LeadPayload = {
   budget: string;
   status: LeadStatus;
   priority: "Haute" | "Moyenne" | "Basse";
+  rdv: LeadRdv | null;
 };
 
 function getSupabaseClient() {
@@ -130,6 +144,25 @@ function getPhoneFromOptions(options: Record<string, unknown> | null) {
   return typeof phone === "string" && phone.trim().length > 0 ? phone : "—";
 }
 
+function formatRdvDate(value: string | null) {
+  if (!value) {
+    return "—";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
 async function loadLeads() {
   const supabase = getSupabaseClient();
 
@@ -159,6 +192,30 @@ async function loadLeads() {
     budgetByDemandeId.set(item.demande_id, item.prix_ttc ?? null);
   }
 
+  // RDV facultatifs : si la table n'existe pas encore, on n'interrompt pas le chargement des leads.
+  const rdvByDemandeId = new Map<string, LeadRdv>();
+
+  const { data: rdvs, error: rdvError } = await supabase
+    .from("rdv")
+    .select("demande_id, date_rdv, canal, statut")
+    .in("demande_id", demandeIds)
+    .order("date_rdv", { ascending: true });
+
+  if (rdvError) {
+    console.warn("Impossible de charger les RDV:", rdvError.message);
+  } else {
+    for (const item of (rdvs ?? []) as RdvRow[]) {
+      // On garde le prochain créneau (le premier par date croissante) pour chaque demande.
+      if (!rdvByDemandeId.has(item.demande_id)) {
+        rdvByDemandeId.set(item.demande_id, {
+          date: formatRdvDate(item.date_rdv),
+          canal: item.canal ?? "—",
+          statut: item.statut ?? "propose",
+        });
+      }
+    }
+  }
+
   const leads: LeadPayload[] = (demandes ?? []).map((demande: DemandeRow) => {
     const status = normalizeStatus(demande.statut);
     const route = [demande.trajet_depart, demande.trajet_arrivee].filter(Boolean).join(" → ");
@@ -175,6 +232,7 @@ async function loadLeads() {
       budget: formatBudget(budgetByDemandeId.get(demande.id) ?? null),
       status,
       priority: getPriority(status),
+      rdv: rdvByDemandeId.get(demande.id) ?? null,
     };
   });
 

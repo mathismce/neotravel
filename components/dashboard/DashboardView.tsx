@@ -34,6 +34,12 @@ type KpiItem = {
   icon: React.ElementType;
 };
 
+type LeadRdv = {
+  date: string;
+  canal: string;
+  statut: string;
+};
+
 type LeadItem = {
   id: string;
   name: string;
@@ -46,6 +52,7 @@ type LeadItem = {
   budget: string;
   status: LeadStatus;
   priority: "Haute" | "Moyenne" | "Basse";
+  rdv: LeadRdv | null;
 };
 
 const commercialKpis: KpiItem[] = [
@@ -464,25 +471,26 @@ export default function DashboardView() {
                           <th className="px-4 py-3 font-semibold">Passagers</th>
                           <th className="px-4 py-3 font-semibold">Montant</th>
                           <th className="px-4 py-3 font-semibold">Arrivée</th>
+                          <th className="px-4 py-3 font-semibold">Rendez-vous</th>
                           <th className="px-4 py-3 font-semibold">Statut</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5 bg-[#0b1020]">
                         {leadsError ? (
                           <tr>
-                            <td className="px-4 py-6 text-sm text-rose-300" colSpan={8}>
+                            <td className="px-4 py-6 text-sm text-rose-300" colSpan={9}>
                               {leadsError}
                             </td>
                           </tr>
                         ) : isLeadsLoading ? (
                           <tr>
-                            <td className="px-4 py-6 text-sm text-white/50" colSpan={8}>
+                            <td className="px-4 py-6 text-sm text-white/50" colSpan={9}>
                               Chargement des leads depuis Supabase…
                             </td>
                           </tr>
                         ) : renderedLeads.length === 0 ? (
                           <tr>
-                            <td className="px-4 py-6 text-sm text-white/50" colSpan={8}>
+                            <td className="px-4 py-6 text-sm text-white/50" colSpan={9}>
                               Aucun lead trouvé dans la table demandes.
                             </td>
                           </tr>
@@ -498,6 +506,18 @@ export default function DashboardView() {
                             <td className="px-4 py-4 align-top text-sm text-white/75">{lead.passengers}</td>
                             <td className="px-4 py-4 align-top text-sm font-semibold text-white">{lead.budget}</td>
                             <td className="px-4 py-4 align-top text-sm text-white/60">{lead.createdAt}</td>
+                            <td className="px-4 py-4 align-top">
+                              {lead.rdv ? (
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-sm font-semibold text-white">{lead.rdv.date}</span>
+                                  <span className="inline-flex w-fit items-center gap-1 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 text-xs font-medium capitalize text-cyan-300">
+                                    {lead.rdv.canal}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-sm text-white/30">—</span>
+                              )}
+                            </td>
                             <td className="px-4 py-4 align-top">
                               <div className="flex flex-col gap-2">
                                 <select
