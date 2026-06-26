@@ -11,6 +11,7 @@ type DemandeRow = {
   trajet_arrivee: string | null;
   date_depart: string | null;
   nb_passagers: number | null;
+  prospect_tel: string | null;
   options: Record<string, unknown> | null;
   statut: string | null;
   created_at: string | null;
@@ -138,8 +139,8 @@ function getPriority(status: LeadStatus): "Haute" | "Moyenne" | "Basse" {
   return "Basse";
 }
 
-function getPhoneFromOptions(options: Record<string, unknown> | null) {
-  const phone = options?.phone ?? options?.telephone ?? options?.tel;
+function getPhone(tel: string | null, options: Record<string, unknown> | null) {
+  const phone = tel ?? options?.phone ?? options?.telephone ?? options?.tel;
 
   return typeof phone === "string" && phone.trim().length > 0 ? phone : "—";
 }
@@ -168,7 +169,7 @@ async function loadLeads() {
 
   const { data: demandes, error: demandesError } = await supabase
     .from("demandes")
-    .select("id, prospect_nom, prospect_email, trajet_depart, trajet_arrivee, date_depart, nb_passagers, options, statut, created_at")
+    .select("id, prospect_nom, prospect_email, trajet_depart, trajet_arrivee, date_depart, nb_passagers, prospect_tel, options, statut, created_at")
     .order("created_at", { ascending: false });
 
   if (demandesError) {
@@ -223,7 +224,7 @@ async function loadLeads() {
     return {
       id: demande.id,
       name: demande.prospect_nom ?? "Contact sans nom",
-      phone: getPhoneFromOptions(demande.options),
+      phone: getPhone(demande.prospect_tel, demande.options),
       email: demande.prospect_email ?? "—",
       route: route.length > 0 ? route : "—",
       departureDate: formatDepartureDate(demande.date_depart),

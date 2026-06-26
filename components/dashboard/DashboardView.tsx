@@ -465,7 +465,6 @@ export default function DashboardView() {
                       <thead className="bg-white/5">
                         <tr className="text-left text-xs uppercase tracking-[0.18em] text-white/45">
                           <th className="px-4 py-3 font-semibold">Contact</th>
-                          <th className="px-4 py-3 font-semibold">Téléphone</th>
                           <th className="px-4 py-3 font-semibold">Trajet</th>
                           <th className="px-4 py-3 font-semibold">Date départ</th>
                           <th className="px-4 py-3 font-semibold">Passagers</th>
@@ -478,19 +477,19 @@ export default function DashboardView() {
                       <tbody className="divide-y divide-white/5 bg-[#0b1020]">
                         {leadsError ? (
                           <tr>
-                            <td className="px-4 py-6 text-sm text-rose-300" colSpan={9}>
+                            <td className="px-4 py-6 text-sm text-rose-300" colSpan={8}>
                               {leadsError}
                             </td>
                           </tr>
                         ) : isLeadsLoading ? (
                           <tr>
-                            <td className="px-4 py-6 text-sm text-white/50" colSpan={9}>
+                            <td className="px-4 py-6 text-sm text-white/50" colSpan={8}>
                               Chargement des leads depuis Supabase…
                             </td>
                           </tr>
                         ) : renderedLeads.length === 0 ? (
                           <tr>
-                            <td className="px-4 py-6 text-sm text-white/50" colSpan={9}>
+                            <td className="px-4 py-6 text-sm text-white/50" colSpan={8}>
                               Aucun lead trouvé dans la table demandes.
                             </td>
                           </tr>
@@ -499,8 +498,8 @@ export default function DashboardView() {
                             <td className="px-4 py-4 align-top">
                               <p className="font-semibold text-white">{lead.name}</p>
                               <p className="mt-1 text-sm text-white/50"><a className="text-white/70 underline" href={`mailto:${lead.email}`}>{lead.email}</a></p>
+                              <p className="mt-1 text-sm text-white/50">{lead.phone}</p>
                             </td>
-                            <td className="px-4 py-4 align-top text-sm text-white/75">{lead.phone}</td>
                             <td className="px-4 py-4 align-top text-sm text-white/75">{lead.route}</td>
                             <td className="px-4 py-4 align-top text-sm text-white/75">{lead.departureDate}</td>
                             <td className="px-4 py-4 align-top text-sm text-white/75">{lead.passengers}</td>
