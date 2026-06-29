@@ -1,21 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
-
-// CLIENTS 
-
-// Client public — frontend
 export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-// Client admin — API routes et tools 
 export const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_KEY!
 )
-
-// TYPES 
 
 export type StatutDemande =
   | 'nouveau_lead'
@@ -27,16 +20,17 @@ export type StatutDemande =
   | 'reprise_humaine'
   | 'sans_suite'
 
-// HELPERS DEMANDES 
+// DEMANDES 
 
 export async function creerDemande(data: {
-  prospect_nom: string
+  prospect_nom:   string
   prospect_email: string
-  trajet_depart: string
+  prospect_tel?:  string
+  trajet_depart:  string
   trajet_arrivee: string
-  date_depart: string
-  nb_passagers: number
-  options: object
+  date_depart:    string
+  nb_passagers:   number
+  options:        object
 }) {
   const { data: result, error } = await supabaseAdmin
     .from('demandes')
@@ -55,10 +49,7 @@ export async function updateStatut(
 ) {
   const { error } = await supabaseAdmin
     .from('demandes')
-    .update({
-      statut,
-      ...(notes && { notes })  
-    })
+    .update({ statut, ...(notes && { notes }) })
     .eq('id', demande_id)
 
   if (error) throw new Error(error.message)
@@ -68,23 +59,23 @@ export async function updateStatut(
 export async function getDemandes() {
   const { data, error } = await supabaseAdmin
     .from('demandes')
-    .select('*, devis(*)')
+    .select('*, devis(*), rdv(*)')
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
   return data
 }
 
-// HELPERS DEVIS 
+// DEVIS 
 
 export async function creerDevis(data: {
-  demande_id: string
-  prix_ht: number
-  tva: number
-  prix_ttc: number
-  lignes: object
+  demande_id:   string
+  prix_ht:      number
+  tva:          number
+  prix_ttc:     number
+  lignes:       object
   coefficients: object
-  pdf_url?: string
+  pdf_url?:     string
 }) {
   const { data: result, error } = await supabaseAdmin
     .from('devis')
@@ -106,10 +97,9 @@ export async function updatePdfUrl(devis_id: string, pdf_url: string) {
   return { success: true }
 }
 
-// HELPERS RELANCE 
+// RELANCE 
 
 export async function creerRelance(devis_id: string) {
-  // Planifie automatiquement J+2
   const prochaineRelance = new Date(
     Date.now() + 2 * 24 * 60 * 60 * 1000
   ).toISOString()
@@ -128,43 +118,21 @@ export async function creerRelance(devis_id: string) {
   return result
 }
 
-export async function incrementerRelance(relance_id: string) {
-  // Récupère le nb_relances actuel
-  const { data: relance, error: fetchError } = await supabaseAdmin
-    .from('relance')
-    .select('nb_relances')
-    .eq('id', relance_id)
+// RDV 
+
+export async function creerRdv(data: {
+  demande_id:     string
+  commercial_id?: string
+  date_rdv?:      string
+  canal?:         string
+  notes?:         string
+}) {
+  const { data: result, error } = await supabaseAdmin
+    .from('rdv')
+    .insert({ ...data, statut: 'en_attente' })
+    .select()
     .single()
 
-  if (fetchError) throw new Error(fetchError.message)
-
-  const nbRelances = relance.nb_relances + 1
-
-  // Calcule la prochaine relance 
-  const prochaineRelance = nbRelances === 1
-    ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
-    : nbRelances === 2
-    ? new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
-    : null  // plus de relances après 3
-
-  const { error } = await supabaseAdmin
-    .from('relance')
-    .update({ nb_relances: nbRelances, prochaine_relance: prochaineRelance })
-    .eq('id', relance_id)
-
   if (error) throw new Error(error.message)
-  return { success: true, nbRelances }
+  return result
 }
-
-export async function getRelancesDues() {
-  // Retourne toutes les relances dont la date est dépassée
-  const { data, error } = await supabaseAdmin
-    .from('relance')
-    .select('*, devis(*, demandes(*))')
-    .lte('prochaine_relance', new Date().toISOString())
-    .lt('nb_relances', 3)  // max 3 relances
-
-  if (error) throw new Error(error.message)
-  return data
-}
-
