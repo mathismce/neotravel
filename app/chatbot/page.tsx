@@ -43,35 +43,79 @@ function ChatbotContent() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
 
-    const trimmed = input.trim();
-    if (!trimmed) {
-      return;
+    const trimmed = input.trim()
+    if (!trimmed) return
+
+    const userMessage: Message = {
+      id: Date.now(),
+      role: 'user',
+      text: trimmed
     }
 
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      {
-        id: Date.now(),
-        role: "user",
-        text: trimmed,
-      },
-    ]);
-    setInput("");
+    const updatedMessages = [...messages, userMessage]
+    setMessages(updatedMessages)
+    setInput('')
 
-    window.setTimeout(() => {
-      setMessages((currentMessages) => [
-        ...currentMessages,
-        {
-          id: Date.now() + 1,
-          role: "assistant",
-          text: "Merci. Précisez maintenant la ville de départ, la destination et le nombre de passagers pour continuer l'échange.",
-        },
-      ]);
-    }, 500);
-  }
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: updatedMessages.map(m => ({
+          role: m.role,
+          content: m.text
+        }))
+      })
+    })
+
+    const reader = res.body?.getReader()
+    const decoder = new TextDecoder()
+    let agentText = ''
+
+    const agentMessage: Message = {
+      id: Date.now() + 1,
+      role: 'assistant',
+      text: ''
+    }
+
+    setMessages(prev => [...prev, agentMessage])
+
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n').filter(Boolean)
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const raw = line.slice(6).trim()
+            if (raw === '[DONE]') break
+          
+            try {
+              const parsed = JSON.parse(raw)
+            
+              if (parsed.type === 'text-delta') {
+                agentText += parsed.delta
+                setMessages(prev =>
+                  prev.map(m =>
+                    m.id === agentMessage.id
+                      ? { ...m, text: agentText }
+                      : m
+                  )
+                )
+              }
+            } catch {
+              // ignore
+            }
+          }
+        }
+      }
+    }
+  } 
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#08111f] px-4 py-10 text-white sm:px-6">

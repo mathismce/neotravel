@@ -1,7 +1,6 @@
 // app/api/chat/route.ts
 
-import { streamText, convertToModelMessages, stepCountIs } from 'ai'
-import type { UIMessage } from 'ai'
+import { streamText, stepCountIs } from 'ai'
 import { gateway } from '@ai-sdk/gateway'
 import { tools } from '@/lib/tools'
 
@@ -17,7 +16,7 @@ TON RÔLE :
 INFORMATIONS OBLIGATOIRES à collecter :
 1. Ville de départ
 2. Ville d'arrivée
-3. Distance en kilomètres (calcule ou demande, de preference calcule)
+3. Distance en kilomètres (calcule ou demande, de préférence calcule)
 4. Aller simple ou aller-retour
 5. Date de départ
 6. Heure de départ souhaitée
@@ -31,6 +30,8 @@ OPTIONS À PROPOSER SYSTÉMATIQUEMENT :
 RÈGLES IMPORTANTES :
 - Ne calcule JAMAIS un prix toi-même — utilise toujours l'outil calculer_devis
 - Si nbPassagers > 85 → utilise l'outil escalader_humain immédiatement
+- Si la date de depart est dans moins de 3 jours → utilise l'outil escalader_humain 
+- Si le montant du devis depasse les 3000 euro → utilise l'outil escalader_humain
 - Si la demande est hors zone ou incohérente → utilise l'outil escalader_humain
 - Pose une seule question à la fois
 - Sois concis et professionnel
@@ -39,19 +40,28 @@ RÈGLES IMPORTANTES :
 `
 
 export async function POST(req: Request) {
+  try {
+    const body = await req.json()
 
-  // 1. Récupère les messages 
-  const { messages }: { messages: UIMessage[] } = await req.json()
+    // Messages au format simple {role, content} — pas besoin de convertToModelMessages
+    const messages = body.messages as { role: 'user' | 'assistant', content: string }[]
 
-  // 2. streamText 
-  const result = streamText({
-    model: gateway('deepseek-v4-flash'),
-    system: SYSTEM_PROMPT,
-    messages: await convertToModelMessages(messages),
-    tools,
-    stopWhen: stepCountIs(5), 
-  })
+    if (!messages || !Array.isArray(messages)) {
+      return Response.json({ error: 'Messages manquants' }, { status: 400 })
+    }
 
-  // 3. Retourne le stream
-  return result.toUIMessageStreamResponse()
+    const result = streamText({
+      model: gateway('deepseek-v4-flash'),
+      system: SYSTEM_PROMPT,
+      messages, // ← directement sans conversion
+      tools,
+      stopWhen: stepCountIs(5),
+    })
+
+    return result.toUIMessageStreamResponse()
+
+  } catch (error) {
+    console.error('ERREUR AGENT:', error)
+    return Response.json({ error: String(error) }, { status: 500 })
+  }
 }
