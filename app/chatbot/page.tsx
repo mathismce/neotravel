@@ -46,6 +46,11 @@ function ChatbotContent() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
+    // Récupère les infos du formulaire
+    const name = searchParams.get("name") || ''
+    const email = searchParams.get("email") || ''
+    const phone = searchParams.get("phone") || ''
+
     const trimmed = input.trim()
     if (!trimmed) return
 
@@ -59,15 +64,26 @@ function ChatbotContent() {
     setMessages(updatedMessages)
     setInput('')
 
+    // Injecte le contexte du formulaire avant les messages
+    const messagesAvecContexte = [
+      {
+        role: 'system' as const,
+        content: `Informations déjà collectées via le formulaire :
+        - Nom : ${name}
+        - Email : ${email}
+        - Téléphone : ${phone}
+        Ne redemande JAMAIS ces informations au prospect. Tu les as déjà.`
+      },
+      ...updatedMessages.map(m => ({
+        role: m.role,
+        content: m.text
+      }))
+    ]
+
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: updatedMessages.map(m => ({
-          role: m.role,
-          content: m.text
-        }))
-      })
+      body: JSON.stringify({ messages: messagesAvecContexte })
     })
 
     const reader = res.body?.getReader()
@@ -94,10 +110,10 @@ function ChatbotContent() {
           if (line.startsWith('data: ')) {
             const raw = line.slice(6).trim()
             if (raw === '[DONE]') break
-          
+
             try {
               const parsed = JSON.parse(raw)
-            
+
               if (parsed.type === 'text-delta') {
                 agentText += parsed.delta
                 setMessages(prev =>
@@ -115,7 +131,7 @@ function ChatbotContent() {
         }
       }
     }
-  } 
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#08111f] px-4 py-10 text-white sm:px-6">

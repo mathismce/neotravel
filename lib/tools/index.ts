@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 export const tools = {
 
-  // OUTIL 1 — Enregistrer la demande 
+  // OUTIL 1 — Enregistrer la demande
   enregistrer_demande: tool({
     description: `
       Enregistre les informations du prospect dans Supabase.
@@ -18,16 +18,25 @@ export const tools = {
       trajet_arrivee: z.string().describe("Ville d'arrivée"),
       date_depart:    z.string().describe('Date de départ YYYY-MM-DD'),
       nb_passagers:   z.number().describe('Nombre de passagers'),
-      options:        z.array(z.string()).describe('Options souhaitées'),
+      options: z.object({
+        guide:         z.boolean().optional(),
+        nuitChauffeur: z.boolean().optional(),
+        peages:        z.boolean().optional(),
+      }).describe('Options souhaitées'),
     }),
     execute: async (params) => {
-      const { creerDemande } = await import('@/lib/supabase')
-      const result = await creerDemande(params)
-      return { success: true, demande_id: result.id }
+      try {
+        const { creerDemande } = await import('@/lib/supabase')
+        const result = await creerDemande(params)
+        return { success: true, demande_id: result.id }
+      } catch (err) {
+        console.error('❌ enregistrer_demande:', err)
+        return { success: false, error: String(err) }
+      }
     },
   }),
 
-  // OUTIL 2 — Calculer le devis 
+  // OUTIL 2 — Calculer le devis
   calculer_devis: tool({
     description: `
       Calcule le prix, enregistre le devis dans Supabase
@@ -47,66 +56,63 @@ export const tools = {
         peages:        z.number().optional(),
       }).optional(),
     }),
+    // ✅ FIX BUG 3 — try/catch ici
     execute: async ({ demande_id, distanceKm, isAllerRetour,
                       nbPassagers, dateDepart, dateDemande, options }) => {
+      try {
+        const { calculerDevis } = await import('@/lib/calculer-devis')
+        const { supabaseAdmin, updateStatut, creerRelance } = await import('@/lib/supabase')
 
-      const { calculerDevis } = await import('@/lib/calculer-devis')
-      const { supabaseAdmin, updateStatut, creerRelance } = await import('@/lib/supabase')
-
-      // 1. Calcule le devis
-      const devis = calculerDevis({
-        distanceKm, isAllerRetour, nbPassagers,
-        dateDepart:  new Date(dateDepart),
-        dateDemande: new Date(dateDemande),
-        options
-      })
-
-      // 2. Enregistre dans la table "devis"
-      const { data: devisData, error } = await supabaseAdmin
-        .from('devis')
-        .insert({
-          demande_id,
-          prix_ht:      devis.totalHT,
-          tva:          devis.totalHT * 0.10,
-          prix_ttc:     devis.totalTTC,
-          lignes:       devis.supplements,
-          coefficients: {
-            saison:   devis.coeffSaisonValue,
-            date:     devis.coeffDateValue,
-            capacite: devis.coeffCapaciteValue,
-          }
+        const devis = calculerDevis({
+          distanceKm, isAllerRetour, nbPassagers,
+          dateDepart:  new Date(dateDepart),
+          dateDemande: new Date(dateDemande),
+          options
         })
-        .select()
-        .single()
 
-      if (error) throw new Error(error.message)
+        const { data: devisData, error } = await supabaseAdmin
+          .from('devis')
+          .insert({
+            demande_id,
+            prix_ht:      devis.totalHT,
+            tva:          devis.totalHT * 0.10,
+            prix_ttc:     devis.totalTTC,
+            lignes:       devis.supplements,
+            coefficients: {
+              saison:   devis.coeffSaisonValue,
+              date:     devis.coeffDateValue,
+              capacite: devis.coeffCapaciteValue,
+            }
+          })
+          .select()
+          .single()
 
-      // 3. Met à jour le statut de la demande
-      await updateStatut(demande_id, 'devis_en_cours')
+        if (error) throw new Error(error.message)
 
-      // 4. Crée une entrée dans la table relance (J+2 automatique)
-      await creerRelance(devisData.id)
+        await updateStatut(demande_id, 'devis_en_cours')
+        await creerRelance(devisData.id)
 
-      // 5. Envoie JUSTE les IDs à n8n
-      await fetch(process.env.N8N_WEBHOOK_URL!, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          demande_id,
-          devis_id: devisData.id
+        await fetch(process.env.N8N_WEBHOOK_URL!, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ demande_id, devis_id: devisData.id })
         })
-      })
 
-      return {
-        success:  true,
-        prix_ttc: devis.totalTTC,
-        prix_ht:  devis.totalHT,
-        message:  `Devis calculé : ${devis.totalTTC}€ TTC. Vous allez recevoir votre proposition par email dans quelques instants.`
+        return {
+          success:  true,
+          prix_ttc: devis.totalTTC,
+          prix_ht:  devis.totalHT,
+          message:  `Devis calculé : ${devis.totalTTC}€ TTC. Vous allez recevoir votre proposition par email dans quelques instants.`
+        }
+
+      } catch (err) {
+        console.error('❌ calculer_devis:', err)
+        return { success: false, error: String(err) }
       }
     },
   }),
 
-  // OUTIL 3 — Escalader vers un humain 
+  // OUTIL 3 — Escalader vers un humain
   escalader_humain: tool({
     description: `
       À appeler quand la demande est hors périmètre ou incohérente.
@@ -116,33 +122,25 @@ export const tools = {
       demande_id: z.string().describe('ID de la demande dans Supabase'),
       raison:     z.string().describe("Raison de l'escalade"),
     }),
+    // ✅ FIX BUG 3 — try/catch ici aussi
     execute: async ({ demande_id, raison }) => {
-      const { updateStatut, creerRdv } = await import('@/lib/supabase')
+      try {
+        const { updateStatut, creerRdv } = await import('@/lib/supabase')
 
-      // 1. Met à jour le statut
-      await updateStatut(demande_id, 'reprise_humaine', raison)
+        await updateStatut(demande_id, 'reprise_humaine', raison)
+        await creerRdv({ demande_id, canal: 'email', notes: raison })
 
-      // 2. Crée un RDV en attente pour le commercial
-      await creerRdv({
-        demande_id,
-        canal: 'email',
-        notes: raison
-      })
-
-      // 3. Notifie n8n pour l'alerte commercial
-      await fetch(process.env.N8N_WEBHOOK_URL!, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          demande_id,
-          type:  'reprise_humaine',
-          raison
+        await fetch(process.env.N8N_WEBHOOK_URL!, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ demande_id, type: 'reprise_humaine', raison })
         })
-      })
 
-      return {
-        success: true,
-        message: 'Un conseiller NeoTravel va vous contacter sous 24h.'
+        return { success: true, message: 'Un conseiller NeoTravel va vous contacter sous 24h.' }
+
+      } catch (err) {
+        console.error('❌ escalader_humain:', err)
+        return { success: false, error: String(err) }
       }
     },
   }),
