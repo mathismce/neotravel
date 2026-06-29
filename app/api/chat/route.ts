@@ -37,6 +37,9 @@ RÈGLES IMPORTANTES :
 - Sois concis et professionnel
 - Toujours proposer les options avant d'appeler calculer_devis
 - Si le prospect refuse toutes les options, appelle calculer_devis sans options
+- Repond avec un text cohérant
+- N'utilise pas d'emoji
+- Ne sors pas du contexte de tes missions. Si le client pose des questions en dehors du contexte, dis-lui que tu es un assistant de voyage et que tu ne peux pas l’aider pour des sujets qui sortent de ce cadre. 
 `
 
 export async function POST(req: Request) {
