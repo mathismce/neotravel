@@ -10,8 +10,10 @@ type Message = {
 };
 
 function ChatbotContent() {
+  const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const [input, setInput] = useState("");
+  
   const [messages, setMessages] = useState<Message[]>(() => {
     const name = searchParams.get("name");
     const email = searchParams.get("email");
@@ -37,34 +39,45 @@ function ChatbotContent() {
         : []),
     ];
   });
+  
   const endRef = useRef<HTMLDivElement | null>(null);
+
+  // Gestion de la soumission via la touche Entrée
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault(); 
+
+      const form = event.currentTarget.form;
+      if (form) {
+        form.requestSubmit(); 
+      }
+    }
+  };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]); // On ajoute isLoading pour défiler aussi quand l'animation apparaît
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    // Récupère les infos du formulaire
-    const name = searchParams.get("name") || ''
-    const email = searchParams.get("email") || ''
-    const phone = searchParams.get("phone") || ''
+    const name = searchParams.get("name") || '';
+    const email = searchParams.get("email") || '';
+    const phone = searchParams.get("phone") || '';
 
-    const trimmed = input.trim()
-    if (!trimmed) return
+    const trimmed = input.trim();
+    if (!trimmed) return;
 
     const userMessage: Message = {
       id: Date.now(),
       role: 'user',
       text: trimmed
-    }
+    };
 
-    const updatedMessages = [...messages, userMessage]
-    setMessages(updatedMessages)
-    setInput('')
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setInput('');
 
-    // Injecte le contexte du formulaire avant les messages
     const messagesAvecContexte = [
       {
         role: 'system' as const,
@@ -78,58 +91,65 @@ function ChatbotContent() {
         role: m.role,
         content: m.text
       }))
-    ]
+    ];
 
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: messagesAvecContexte })
-    })
+    setIsLoading(true); // On lance l'animation de réflexion
 
-    const reader = res.body?.getReader()
-    const decoder = new TextDecoder()
-    let agentText = ''
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: messagesAvecContexte })
+      });
 
-    const agentMessage: Message = {
-      id: Date.now() + 1,
-      role: 'assistant',
-      text: ''
-    }
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let agentText = '';
+      let hasCreatedMessage = false;
+      const agentMessageId = Date.now() + 1;
 
-    setMessages(prev => [...prev, agentMessage])
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-    if (reader) {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(Boolean);
 
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n').filter(Boolean)
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const raw = line.slice(6).trim();
+              if (raw === '[DONE]') break;
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const raw = line.slice(6).trim()
-            if (raw === '[DONE]') break
+              try {
+                const parsed = JSON.parse(raw);
 
-            try {
-              const parsed = JSON.parse(raw)
-
-              if (parsed.type === 'text-delta') {
-                agentText += parsed.delta
-                setMessages(prev =>
-                  prev.map(m =>
-                    m.id === agentMessage.id
-                      ? { ...m, text: agentText }
-                      : m
-                  )
-                )
+                if (parsed.type === 'text-delta') {
+                  agentText += parsed.delta;
+                  
+                  if (!hasCreatedMessage) {
+                    setIsLoading(false); // On coupe l'animation dès le premier mot reçu
+                    setMessages(prev => [...prev, { id: agentMessageId, role: 'assistant', text: agentText }]);
+                    hasCreatedMessage = true;
+                  } else {
+                    setMessages(prev =>
+                      prev.map(m =>
+                        m.id === agentMessageId ? { ...m, text: agentText } : m
+                      )
+                    );
+                  }
+                }
+              } catch {
+                // ignore
               }
-            } catch {
-              // ignore
             }
           }
         }
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false); // Sécurité pour couper l'animation quoi qu'il arrive
     }
   }
 
@@ -169,6 +189,18 @@ function ChatbotContent() {
                   </div>
                 </div>
               ))}
+
+              {/* Animation de réflexion de l'assistant */}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-black/25 px-4 py-3.5 shadow-sm">
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-lime-300 [animation-delay:-0.3s]"></span>
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-lime-300 [animation-delay:-0.15s]"></span>
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-lime-300"></span>
+                  </div>
+                </div>
+              )}
+              
               <div ref={endRef} />
             </div>
           </div>
@@ -183,6 +215,7 @@ function ChatbotContent() {
                   id="chat-input"
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Écrivez votre message..."
                   rows={2}
                   className="min-h-[56px] w-full resize-none rounded-2xl border border-white/12 bg-[#f7f4ec] px-4 py-3 text-zinc-950 outline-none transition placeholder:text-slate-500 focus:border-lime-300 focus:ring-2 focus:ring-lime-200"
