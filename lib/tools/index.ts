@@ -65,7 +65,7 @@ export const tools = {
           nbPassagers, dateDepart, dateDemande, options
         }) 
         const { calculerDevis } = await import('@/lib/calculer-devis')
-        const { supabaseAdmin, updateStatut, creerRelance } = await import('@/lib/supabase')
+        const { supabaseAdmin, updateStatut} = await import('@/lib/supabase')
 
         const devis = calculerDevis({
           distanceKm, isAllerRetour, nbPassagers,
@@ -95,7 +95,6 @@ export const tools = {
         if (error) throw new Error(error.message)
 
         await updateStatut(demande_id, 'devis_en_cours')
-        await creerRelance(devisData.id)
 
         await fetch(process.env.N8N_WEBHOOK_URL!, {
           method: 'POST',
@@ -127,13 +126,11 @@ export const tools = {
       demande_id: z.string().describe('ID de la demande dans Supabase'),
       raison:     z.string().describe("Raison de l'escalade"),
     }),
-    // ✅ FIX BUG 3 — try/catch ici aussi
     execute: async ({ demande_id, raison }) => {
       try {
-        const { updateStatut, creerRdv } = await import('@/lib/supabase')
+        const { updateStatut, } = await import('@/lib/supabase')
 
         await updateStatut(demande_id, 'reprise_humaine', raison)
-        await creerRdv({ demande_id, canal: 'email', notes: raison })
 
         await fetch(process.env.N8N_WEBHOOK_URL!, {
           method: 'POST',
