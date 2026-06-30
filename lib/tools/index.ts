@@ -19,10 +19,10 @@ export const tools = {
       date_depart:    z.string().describe('Date de départ YYYY-MM-DD'),
       nb_passagers:   z.number().describe('Nombre de passagers'),
       options: z.object({
-        guide:         z.boolean().optional(),
-        nuitChauffeur: z.boolean().optional(),
-        peages:        z.boolean().optional(),
-      }).describe('Options souhaitées'),
+        guide:         z.object({ nbJours: z.number() }).optional(),
+        nuitChauffeur: z.object({ nbNuits: z.number() }).optional(),
+        peages:        z.number().optional(),
+      }).optional().describe('Options souhaitées'),
     }),
     execute: async (params) => {
       try {
