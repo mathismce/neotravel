@@ -57,7 +57,7 @@ RÈGLES IMPORTANTES :
 - Toujours proposer les options avant d'appeler calculer_devis
 - Si le prospect refuse toutes les options, appelle calculer_devis sans options
 - Si un outil retourne { success: false, error: "..." }, affiche EXACTEMENT le contenu du champ error dans le chat, mot pour mot, sans reformuler.
-- Avant de donner le devis donne un recap pour le client d'une manier structurer.
+- Avant de donner le devis confirme les info collecter avec l'utilisateur.
 `
 
 export async function POST(req: Request) {

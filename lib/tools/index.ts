@@ -56,7 +56,7 @@ export const tools = {
         peages:        z.number().optional(),
       }).optional(),
     }),
-    // ✅ FIX BUG 3 — try/catch ici
+    
     execute: async ({ demande_id, distanceKm, isAllerRetour,
                       nbPassagers, dateDepart, dateDemande, options }) => {
       try {
@@ -77,7 +77,7 @@ export const tools = {
             prix_ht:      devis.totalHT,
             tva:          devis.totalHT * 0.10,
             prix_ttc:     devis.totalTTC,
-            distance_km:  distanceKm,
+            distance:  distanceKm,
             lignes:       devis.supplements,
             coefficients: {
               saison:   devis.coeffSaisonValue,
