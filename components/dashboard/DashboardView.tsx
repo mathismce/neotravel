@@ -128,6 +128,7 @@ const commercialKpis: KpiItem[] = [
     period: "Moyenne 30 jours",
     note: "Cycle de décision légèrement rallongé.",
     icon: Clock,
+    liveKey: "delai_devis_resa",
   },
   {
     category: "Relance",
@@ -172,6 +173,7 @@ const solutionKpis: KpiItem[] = [
     period: "Dernière release",
     note: "Les écarts restent marginaux.",
     icon: LineChart,
+    liveKey: "erreur_devis",
   },
   {
     category: "Infrastructure",

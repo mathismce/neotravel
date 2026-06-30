@@ -266,6 +266,16 @@ export async function PATCH(request: Request) {
       throw error;
     }
 
+    // Trace la réservation pour le KPI "délai devis → réservation" (best-effort).
+    if (body.status === "Réservé") {
+      const { error: eventError } = await supabase
+        .from("events")
+        .insert({ type: "reservation", demande_id: body.id, payload: {} });
+      if (eventError) {
+        console.warn("Impossible de logger l'événement réservation:", eventError.message);
+      }
+    }
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Impossible de mettre à jour le statut.";

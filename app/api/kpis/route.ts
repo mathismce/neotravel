@@ -21,6 +21,12 @@ type DevisRow = {
   prix_ttc: number | null;
 };
 
+type EventRow = {
+  type: string;
+  demande_id: string | null;
+  created_at: string | null;
+};
+
 function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -80,6 +86,17 @@ async function computeKpis(): Promise<Record<string, KpiValue>> {
 
   const devis = (devisData ?? []) as DevisRow[];
 
+  // Events : facultatif. Si la table n'existe pas encore, on n'interrompt pas le calcul.
+  let events: EventRow[] = [];
+  const { data: eventsData, error: eventsError } = await supabase
+    .from("events")
+    .select("type, demande_id, created_at");
+  if (eventsError) {
+    console.warn("Impossible de charger les events:", eventsError.message);
+  } else {
+    events = (eventsData ?? []) as EventRow[];
+  }
+
   // --- Bornes temporelles (jour glissant) ---
   const now = Date.now();
   const DAY = 24 * 60 * 60 * 1000;
@@ -122,6 +139,40 @@ async function computeKpis(): Promise<Record<string, KpiValue>> {
   const conversionFraction = totalDevisDemandes > 0 ? reservedIds.size / totalDevisDemandes : 0;
   const escaladeFraction = totalDemandes > 0 ? escaladeCount / totalDemandes : 0;
 
+  // --- KPI basés sur les events ---
+
+  // Taux d'erreur calculer_devis : échecs / (échecs + succès).
+  const devisOkCount = events.filter((e) => e.type === "devis_calcule").length;
+  const devisErrCount = events.filter((e) => e.type === "devis_erreur").length;
+  const devisTotalCount = devisOkCount + devisErrCount;
+  const erreurDevisFraction = devisTotalCount > 0 ? devisErrCount / devisTotalCount : 0;
+
+  // Délai devis → réservation : pour chaque demande, premier devis_calcule puis
+  // première reservation postérieure. Moyenne exprimée en jours.
+  const firstEventTime = (type: string) => {
+    const map = new Map<string, number>();
+    for (const e of events) {
+      if (e.type !== type || !e.demande_id || !e.created_at) continue;
+      const t = new Date(e.created_at).getTime();
+      if (Number.isNaN(t)) continue;
+      const prev = map.get(e.demande_id);
+      if (prev === undefined || t < prev) map.set(e.demande_id, t);
+    }
+    return map;
+  };
+  const devisTimes = firstEventTime("devis_calcule");
+  const resaTimes = firstEventTime("reservation");
+
+  const delais: number[] = [];
+  for (const [demandeId, resaT] of resaTimes) {
+    const devisT = devisTimes.get(demandeId);
+    if (devisT !== undefined && resaT >= devisT) {
+      delais.push((resaT - devisT) / DAY);
+    }
+  }
+  const delaiMoyenJours =
+    delais.length > 0 ? delais.reduce((sum, d) => sum + d, 0) / delais.length : null;
+
   return {
     leads_jour: {
       value: String(leadsToday),
@@ -154,6 +205,23 @@ async function computeKpis(): Promise<Record<string, KpiValue>> {
       note: devisReserves.length > 0
         ? "Panier moyen des dossiers réservés."
         : "Panier moyen estimé sur l'ensemble des devis.",
+    },
+    erreur_devis: {
+      value: devisTotalCount > 0 ? formatPct(erreurDevisFraction) : "—",
+      delta: `${devisErrCount}/${devisTotalCount} appels`,
+      // Moins d'erreurs = mieux : vert si 0, rouge sinon.
+      trend: devisErrCount === 0 ? "positive" : "negative",
+      note: devisTotalCount > 0
+        ? "Échecs du calcul de devis sur le total des appels."
+        : "Aucun appel calculer_devis enregistré pour l'instant.",
+    },
+    delai_devis_resa: {
+      value: delaiMoyenJours !== null ? `${delaiMoyenJours.toFixed(1).replace(".", ",")} j` : "—",
+      delta: `${delais.length} réservation${delais.length > 1 ? "s" : ""}`,
+      trend: "neutral",
+      note: delaiMoyenJours !== null
+        ? "Temps moyen entre le devis et la réservation."
+        : "Pas encore de réservation après devis.",
     },
   };
 }

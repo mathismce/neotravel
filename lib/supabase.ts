@@ -26,7 +26,36 @@ export type StatutRdv =
   | 'honore'
   | 'annule'
 
-// DEMANDES 
+// EVENTS — journal générique pour les KPI (délais, taux d'erreur).
+// Volontairement non bloquant : un échec de log ne doit jamais casser le flux métier.
+
+export type EventType =
+  | 'demande_creee'
+  | 'devis_calcule'
+  | 'devis_erreur'
+  | 'escalade'
+  | 'reservation'
+
+export async function logEvent(event: {
+  type:        EventType
+  demande_id?: string | null
+  devis_id?:   string | null
+  payload?:    Record<string, unknown>
+}) {
+  try {
+    const { error } = await supabaseAdmin.from('events').insert({
+      type:       event.type,
+      demande_id: event.demande_id ?? null,
+      devis_id:   event.devis_id ?? null,
+      payload:    event.payload ?? {},
+    })
+    if (error) console.warn('⚠️ logEvent échoué:', error.message)
+  } catch (err) {
+    console.warn('⚠️ logEvent échoué:', err)
+  }
+}
+
+// DEMANDES
 
 export async function creerDemande(data: {
   prospect_nom:   string

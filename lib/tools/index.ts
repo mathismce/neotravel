@@ -26,8 +26,9 @@ export const tools = {
     }),
     execute: async (params) => {
       try {
-        const { creerDemande } = await import('@/lib/supabase')
+        const { creerDemande, logEvent } = await import('@/lib/supabase')
         const result = await creerDemande(params)
+        await logEvent({ type: 'demande_creee', demande_id: result.id })
         return { success: true, demande_id: result.id }
       } catch (err) {
         console.error('❌ enregistrer_demande:', err)
@@ -65,7 +66,7 @@ export const tools = {
           nbPassagers, dateDepart, dateDemande, options
         }) 
         const { calculerDevis } = await import('@/lib/calculer-devis')
-        const { supabaseAdmin, updateStatut} = await import('@/lib/supabase')
+        const { supabaseAdmin, updateStatut, logEvent } = await import('@/lib/supabase')
 
         const devis = calculerDevis({
           distanceKm, isAllerRetour, nbPassagers,
@@ -93,6 +94,13 @@ export const tools = {
           .single()
 
         if (error) throw new Error(error.message)
+
+        await logEvent({
+          type: 'devis_calcule',
+          demande_id,
+          devis_id: devisData.id,
+          payload: { prix_ttc: devis.totalTTC, prix_ht: devis.totalHT },
+        })
 
         await updateStatut(demande_id, 'devis_en_cours')
 
@@ -125,6 +133,10 @@ export const tools = {
 
       } catch (err) {
         console.error('❌ calculer_devis:', err)
+        try {
+          const { logEvent } = await import('@/lib/supabase')
+          await logEvent({ type: 'devis_erreur', demande_id, payload: { error: String(err) } })
+        } catch { /* log best-effort */ }
         return { success: false, error: String(err) }
       }
     },
@@ -142,9 +154,10 @@ export const tools = {
     }),
     execute: async ({ demande_id, raison }) => {
       try {
-        const { updateStatut, } = await import('@/lib/supabase')
+        const { updateStatut, logEvent } = await import('@/lib/supabase')
 
         await updateStatut(demande_id, 'reprise_humaine', raison)
+        await logEvent({ type: 'escalade', demande_id, payload: { raison } })
 
         // L'escalade est déjà enregistrée : un échec du webhook n8n ne doit pas
         // faire échouer la reprise humaine côté client.
