@@ -36,7 +36,7 @@ export async function creerDemande(data: {
   trajet_arrivee: string
   date_depart:    string
   nb_passagers:   number
-  options:        object
+  options?:        object
 }) {
   const { data: result, error } = await supabaseAdmin
     .from('demandes')

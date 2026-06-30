@@ -60,6 +60,10 @@ export const tools = {
     execute: async ({ demande_id, distanceKm, isAllerRetour,
                       nbPassagers, dateDepart, dateDemande, options }) => {
       try {
+        console.log('🔍 PARAMS REÇUS PAR LE TOOL:', {
+          demande_id, distanceKm, isAllerRetour,
+          nbPassagers, dateDepart, dateDemande, options
+        }) 
         const { calculerDevis } = await import('@/lib/calculer-devis')
         const { supabaseAdmin, updateStatut, creerRelance } = await import('@/lib/supabase')
 

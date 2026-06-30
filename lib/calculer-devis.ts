@@ -30,6 +30,7 @@ export interface DevisOutput {
 }
 
 export function calculerDevis(input: DevisInput): DevisOutput {
+  console.log('🔍 INPUT REÇU PAR calculerDevis:', JSON.stringify(input, null, 2)) 
   const { distanceKm, isAllerRetour, nbPassagers, dateDepart, dateDemande } = input;
 
   let tarifBase = 0;
