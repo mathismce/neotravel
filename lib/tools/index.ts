@@ -96,11 +96,25 @@ export const tools = {
 
         await updateStatut(demande_id, 'devis_en_cours')
 
-        await fetch(process.env.N8N_WEBHOOK_URL!, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ demande_id, devis_id: devisData.id })
-        })
+        // Laisse l'écriture en BDD se propager avant de notifier n8n, pour que
+        // le webhook trouve bien la demande/le devis quand il relit Supabase.
+        await new Promise((resolve) => setTimeout(resolve, 3000))
+
+        // Le devis est déjà enregistré : un échec du webhook n8n (instance
+        // injoignable, URL absente…) ne doit PAS faire échouer le devis côté client.
+        try {
+          if (process.env.N8N_WEBHOOK_URL) {
+            await fetch(process.env.N8N_WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ demande_id, devis_id: devisData.id })
+            })
+          } else {
+            console.warn('⚠️ N8N_WEBHOOK_URL non défini — webhook devis ignoré')
+          }
+        } catch (webhookErr) {
+          console.error('⚠️ Webhook n8n (devis) échoué, devis quand même enregistré:', webhookErr)
+        }
 
         return {
           success:  true,
@@ -132,11 +146,21 @@ export const tools = {
 
         await updateStatut(demande_id, 'reprise_humaine', raison)
 
-        await fetch(process.env.N8N_WEBHOOK_URL!, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ demande_id, type: 'reprise_humaine', raison })
-        })
+        // L'escalade est déjà enregistrée : un échec du webhook n8n ne doit pas
+        // faire échouer la reprise humaine côté client.
+        try {
+          if (process.env.N8N_WEBHOOK_URL) {
+            await fetch(process.env.N8N_WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ demande_id, type: 'reprise_humaine', raison })
+            })
+          } else {
+            console.warn('⚠️ N8N_WEBHOOK_URL non défini — webhook escalade ignoré')
+          }
+        } catch (webhookErr) {
+          console.error('⚠️ Webhook n8n (escalade) échoué, escalade quand même enregistrée:', webhookErr)
+        }
 
         return { success: true, message: 'Un conseiller NeoTravel va vous contacter sous 24h.' }
 
