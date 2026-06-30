@@ -79,7 +79,7 @@ export async function creerDevis(data: {
   prix_ht:      number
   tva:          number
   prix_ttc:     number
-  distance_km:  number
+  distance:  number
   lignes:       object
   coefficients: object
   pdf_url?:     string
