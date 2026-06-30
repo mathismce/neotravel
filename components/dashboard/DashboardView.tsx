@@ -107,6 +107,7 @@ const commercialKpis: KpiItem[] = [
     period: "Depuis 7 jours",
     note: "Réactivité en nette amélioration.",
     icon: Clock,
+    liveKey: "delai_reprise",
   },
   {
     category: "Conversion",
@@ -129,16 +130,6 @@ const commercialKpis: KpiItem[] = [
     note: "Cycle de décision légèrement rallongé.",
     icon: Clock,
     liveKey: "delai_devis_resa",
-  },
-  {
-    category: "Relance",
-    indicator: "Réponse J+1 / J+3",
-    value: "54% / 41%",
-    delta: "-2 pts",
-    trend: "negative",
-    period: "Campagnes en cours",
-    note: "Légère baisse de réactivité sur J+1.",
-    icon: MessageSquare,
   },
   {
     category: "Revenus",
@@ -174,16 +165,6 @@ const solutionKpis: KpiItem[] = [
     note: "Les écarts restent marginaux.",
     icon: LineChart,
     liveKey: "erreur_devis",
-  },
-  {
-    category: "Infrastructure",
-    indicator: "Succès des workflows n8n",
-    value: "98,7%",
-    delta: "+1,1 pt",
-    trend: "positive",
-    period: "Ce mois-ci",
-    note: "Scénarios exécutés sans incident.",
-    icon: Server,
   },
   {
     category: "Feedback",

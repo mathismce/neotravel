@@ -266,14 +266,27 @@ export async function PATCH(request: Request) {
       throw error;
     }
 
-    // Trace la réservation pour le KPI "délai devis → réservation" (best-effort).
-    if (body.status === "Réservé") {
-      const { error: eventError } = await supabase
-        .from("events")
-        .insert({ type: "reservation", demande_id: body.id, payload: {} });
-      if (eventError) {
-        console.warn("Impossible de logger l'événement réservation:", eventError.message);
+    // Events best-effort pour les KPI de délais.
+    try {
+      // Réservation -> KPI "délai devis → réservation".
+      if (body.status === "Réservé") {
+        await supabase.from("events").insert({ type: "reservation", demande_id: body.id, payload: {} });
       }
+
+      // Première action humaine sur un dossier escaladé -> KPI "délai de reprise".
+      const { data: existing } = await supabase
+        .from("events")
+        .select("type")
+        .eq("demande_id", body.id);
+      const hasEscalade = (existing ?? []).some((e) => e.type === "escalade");
+      const alreadyReprise = (existing ?? []).some((e) => e.type === "reprise_traitee");
+      if (hasEscalade && !alreadyReprise) {
+        await supabase
+          .from("events")
+          .insert({ type: "reprise_traitee", demande_id: body.id, payload: { statut: body.status } });
+      }
+    } catch (eventError) {
+      console.warn("Impossible de logger les events de statut:", eventError);
     }
 
     return NextResponse.json({ ok: true });

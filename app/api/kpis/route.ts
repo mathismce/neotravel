@@ -173,6 +173,27 @@ async function computeKpis(): Promise<Record<string, KpiValue>> {
   const delaiMoyenJours =
     delais.length > 0 ? delais.reduce((sum, d) => sum + d, 0) / delais.length : null;
 
+  // Délai de reprise : entre l'escalade et la première action humaine (reprise_traitee).
+  const escaladeTimes = firstEventTime("escalade");
+  const repriseTimes = firstEventTime("reprise_traitee");
+  const reprises: number[] = [];
+  for (const [demandeId, repriseT] of repriseTimes) {
+    const escaladeT = escaladeTimes.get(demandeId);
+    if (escaladeT !== undefined && repriseT >= escaladeT) {
+      reprises.push(repriseT - escaladeT); // en ms
+    }
+  }
+  const delaiRepriseMs =
+    reprises.length > 0 ? reprises.reduce((sum, d) => sum + d, 0) / reprises.length : null;
+
+  const formatDuree = (ms: number): string => {
+    const minutes = ms / 60000;
+    if (minutes < 60) return `${Math.round(minutes)} min`;
+    const heures = minutes / 60;
+    if (heures < 24) return `${heures.toFixed(1).replace(".", ",")} h`;
+    return `${(heures / 24).toFixed(1).replace(".", ",")} j`;
+  };
+
   return {
     leads_jour: {
       value: String(leadsToday),
@@ -222,6 +243,14 @@ async function computeKpis(): Promise<Record<string, KpiValue>> {
       note: delaiMoyenJours !== null
         ? "Temps moyen entre le devis et la réservation."
         : "Pas encore de réservation après devis.",
+    },
+    delai_reprise: {
+      value: delaiRepriseMs !== null ? formatDuree(delaiRepriseMs) : "—",
+      delta: `${reprises.length} reprise${reprises.length > 1 ? "s" : ""}`,
+      trend: "neutral",
+      note: delaiRepriseMs !== null
+        ? "Temps moyen entre l'escalade et la prise en charge humaine."
+        : "Aucun dossier escaladé repris pour l'instant.",
     },
   };
 }
