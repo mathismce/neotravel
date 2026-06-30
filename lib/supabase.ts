@@ -20,6 +20,12 @@ export type StatutDemande =
   | 'reprise_humaine'
   | 'sans_suite'
 
+export type StatutRdv =
+  | 'propose'
+  | 'confirme'
+  | 'honore'
+  | 'annule'
+
 // DEMANDES 
 
 export async function creerDemande(data: {
@@ -73,6 +79,7 @@ export async function creerDevis(data: {
   prix_ht:      number
   tva:          number
   prix_ttc:     number
+  distance_km:  number
   lignes:       object
   coefficients: object
   pdf_url?:     string
@@ -129,7 +136,7 @@ export async function creerRdv(data: {
 }) {
   const { data: result, error } = await supabaseAdmin
     .from('rdv')
-    .insert({ ...data, statut: 'en_attente' })
+    .insert({ ...data, statut:  'propose' as StatutRdv })
     .select()
     .single()
 
