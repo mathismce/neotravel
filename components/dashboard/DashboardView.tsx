@@ -32,6 +32,15 @@ type KpiItem = {
   period: string;
   note: string;
   icon: React.ElementType;
+  // Clé de calcul côté /api/kpis. Absente => KPI pas encore branché ("À venir").
+  liveKey?: string;
+};
+
+type KpiValue = {
+  value: string;
+  delta: string;
+  trend: TrendType;
+  note: string;
 };
 
 type LeadRdv = {
@@ -65,6 +74,7 @@ const commercialKpis: KpiItem[] = [
     period: "Dernières 24 h",
     note: "Flux simulé sur une journée active.",
     icon: Activity,
+    liveKey: "leads_jour",
   },
   {
     category: "Pipeline",
@@ -75,6 +85,7 @@ const commercialKpis: KpiItem[] = [
     period: "Cette semaine",
     note: "Les leads chauds dominent le volume.",
     icon: Bot,
+    liveKey: "qualif_auto",
   },
   {
     category: "Humain",
@@ -85,6 +96,7 @@ const commercialKpis: KpiItem[] = [
     period: "Moyenne mensuelle",
     note: "Moins de dossiers transférés à l’équipe.",
     icon: Users,
+    liveKey: "escalade",
   },
   {
     category: "Humain",
@@ -105,6 +117,7 @@ const commercialKpis: KpiItem[] = [
     period: "Pipeline du mois",
     note: "Les offres simples convertissent mieux.",
     icon: Zap,
+    liveKey: "conversion_devis_resa",
   },
   {
     category: "Conversion",
@@ -135,6 +148,7 @@ const commercialKpis: KpiItem[] = [
     period: "Réservations signées",
     note: "Panier moyen supérieur à l'objectif.",
     icon: Euro,
+    liveKey: "ticket_moyen",
   },
 ];
 
@@ -214,17 +228,58 @@ function TrendBadge({ trend, delta }: { trend: TrendType; delta: string }) {
   );
 }
 
-function DashboardKpiCard({ item, tone }: { item: KpiItem; tone: "commercial" | "solution" }) {
-  const accentGradient = tone === "commercial" 
-    ? "from-lime-500/10 to-transparent border-lime-500/20" 
+function DashboardKpiCard({
+  item,
+  tone,
+  kpiValues,
+  isLoading,
+}: {
+  item: KpiItem;
+  tone: "commercial" | "solution";
+  kpiValues: Record<string, KpiValue>;
+  isLoading: boolean;
+}) {
+  const accentGradient = tone === "commercial"
+    ? "from-lime-500/10 to-transparent border-lime-500/20"
     : "from-cyan-500/10 to-transparent border-cyan-500/20";
-    
+
   const Icon = item.icon;
+
+  // Résout l'affichage : valeur réelle si KPI branché et chargé, sinon état dédié.
+  const live = item.liveKey ? kpiValues[item.liveKey] : undefined;
+  const isLive = Boolean(item.liveKey);
+
+  let value = item.value;
+  let delta = item.delta;
+  let trend = item.trend;
+  let note = item.note;
+  let badge: "trend" | "soon" | "loading" = "trend";
+
+  if (isLive && isLoading) {
+    value = "…";
+    note = "Chargement des données…";
+    badge = "loading";
+  } else if (isLive && live) {
+    value = live.value;
+    delta = live.delta;
+    trend = live.trend;
+    note = live.note;
+    badge = "trend";
+  } else if (isLive) {
+    value = "—";
+    note = "Donnée indisponible.";
+    badge = "loading";
+  } else {
+    // KPI pas encore branché sur des données réelles.
+    value = "—";
+    note = "Indicateur en cours de mise en place.";
+    badge = "soon";
+  }
 
   return (
     <article className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0f172a]/80 p-5 shadow-lg backdrop-blur-xl transition-all hover:-translate-y-1 hover:border-white/20 hover:shadow-2xl">
       <div className={`absolute inset-0 bg-gradient-to-br opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${accentGradient}`} />
-      
+
       <div className="relative z-10">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -233,19 +288,29 @@ function DashboardKpiCard({ item, tone }: { item: KpiItem; tone: "commercial" | 
             </div>
             <p className="text-xs font-semibold uppercase tracking-widest text-white/50">{item.category}</p>
           </div>
-          <TrendBadge trend={item.trend} delta={item.delta} />
+          {badge === "trend" ? (
+            <TrendBadge trend={trend} delta={delta} />
+          ) : badge === "soon" ? (
+            <span className="flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-300">
+              À venir
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs font-semibold text-white/40">
+              …
+            </span>
+          )}
         </div>
 
         <div className="mt-4">
           <h3 className="text-sm font-medium text-white/80">{item.indicator}</h3>
           <div className="mt-1 flex items-baseline gap-2">
-            <p className="text-3xl font-black tracking-tight text-white">{item.value}</p>
+            <p className="text-3xl font-black tracking-tight text-white">{value}</p>
             <p className="text-xs font-medium uppercase tracking-wider text-white/30">{item.period}</p>
           </div>
         </div>
 
         <div className="mt-4 border-t border-white/5 pt-4">
-          <p className="text-xs leading-5 text-white/50">{item.note}</p>
+          <p className="text-xs leading-5 text-white/50">{note}</p>
         </div>
       </div>
     </article>
@@ -258,6 +323,30 @@ export default function DashboardView() {
   const [leads, setLeads] = useState<LeadItem[]>([]);
   const [isLeadsLoading, setIsLeadsLoading] = useState(true);
   const [leadsError, setLeadsError] = useState<string | null>(null);
+  const [kpiValues, setKpiValues] = useState<Record<string, KpiValue>>({});
+  const [isKpisLoading, setIsKpisLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetch("/api/kpis", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload: { kpis?: Record<string, KpiValue> } | null) => {
+        if (isMounted && payload?.kpis) {
+          setKpiValues(payload.kpis);
+        }
+      })
+      .catch(() => {
+        /* KPI réels optionnels : on garde l'état "indisponible" en cas d'échec */
+      })
+      .finally(() => {
+        if (isMounted) setIsKpisLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -407,7 +496,13 @@ export default function DashboardView() {
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {commercialKpis.map((item) => (
-                    <DashboardKpiCard key={item.indicator} item={item} tone="commercial" />
+                    <DashboardKpiCard
+                      key={item.indicator}
+                      item={item}
+                      tone="commercial"
+                      kpiValues={kpiValues}
+                      isLoading={isKpisLoading}
+                    />
                   ))}
                 </div>
               </div>
@@ -418,7 +513,13 @@ export default function DashboardView() {
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {solutionKpis.map((item) => (
-                    <DashboardKpiCard key={item.indicator} item={item} tone="solution" />
+                    <DashboardKpiCard
+                      key={item.indicator}
+                      item={item}
+                      tone="solution"
+                      kpiValues={kpiValues}
+                      isLoading={isKpisLoading}
+                    />
                   ))}
                 </div>
               </div>
