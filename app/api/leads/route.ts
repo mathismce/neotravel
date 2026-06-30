@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
-type LeadStatus = "À traiter" | "À rappeler" | "Réservé" | "Relance en cours" | "À relancer";
+type LeadStatus = "À traiter" | "À rappeler" | "Réservé" | "Relance en cours" | "À relancer" | "Clôturé";
 
 type DemandeRow = {
   id: string;
@@ -73,6 +73,9 @@ function normalizeStatus(status: string | null | undefined): LeadStatus {
   }
   if (lowerStatus === "à relancer" || lowerStatus === "a relancer") {
     return "À relancer";
+  }
+  if (lowerStatus === "clôturé" || lowerStatus === "cloture" || lowerStatus === "cloturé" || lowerStatus === "clôture") {
+    return "Clôturé";
   }
 
   return "À traiter";

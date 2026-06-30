@@ -66,7 +66,7 @@ export const tools = {
           nbPassagers, dateDepart, dateDemande, options
         }) 
         const { calculerDevis } = await import('@/lib/calculer-devis')
-        const { supabaseAdmin, updateStatut, logEvent } = await import('@/lib/supabase')
+        const { supabaseAdmin, logEvent } = await import('@/lib/supabase')
 
         const devis = calculerDevis({
           distanceKm, isAllerRetour, nbPassagers,
@@ -102,7 +102,8 @@ export const tools = {
           payload: { prix_ttc: devis.totalTTC, prix_ht: devis.totalHT },
         })
 
-        await updateStatut(demande_id, 'devis_en_cours')
+        // Pas de statut imposé après le calcul du devis : on laisse le statut en
+        // l'état (vide) pour ne pas surcharger la demande à cette étape.
 
         // Laisse l'écriture en BDD se propager avant de notifier n8n, pour que
         // le webhook trouve bien la demande/le devis quand il relit Supabase.

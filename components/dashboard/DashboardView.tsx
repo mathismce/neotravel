@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 type TrendType = "positive" | "negative" | "neutral";
-type LeadStatus = "À traiter" | "À rappeler" | "Réservé" | "Relance en cours" | "À relancer";
+type LeadStatus = "À traiter" | "À rappeler" | "Réservé" | "Relance en cours" | "À relancer" | "Clôturé";
 
 type KpiItem = {
   category: string;
@@ -178,13 +178,14 @@ const solutionKpis: KpiItem[] = [
   },
 ];
 
-const leadStatuses: LeadStatus[] = ["À traiter", "À rappeler", "Réservé", "Relance en cours", "À relancer"];
+const leadStatuses: LeadStatus[] = ["À traiter", "À rappeler", "Réservé", "Relance en cours", "À relancer", "Clôturé"];
 const leadStatusRank: Record<LeadStatus, number> = {
   "À traiter": 0,
   "À rappeler": 1,
   "Relance en cours": 2,
   "À relancer": 3,
   Réservé: 4,
+  Clôturé: 5,
 };
 
 function TrendBadge({ trend, delta }: { trend: TrendType; delta: string }) {

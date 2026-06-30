@@ -67,9 +67,11 @@ export async function creerDemande(data: {
   nb_passagers:   number
   options?:        object
 }) {
+  // Aucun statut posé automatiquement : le statut est laissé vide et qualifié
+  // manuellement depuis le dashboard.
   const { data: result, error } = await supabaseAdmin
     .from('demandes')
-    .insert({ ...data, statut: 'nouveau_lead' })
+    .insert({ ...data })
     .select()
     .single()
 
