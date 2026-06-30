@@ -77,6 +77,7 @@ export const tools = {
             prix_ht:      devis.totalHT,
             tva:          devis.totalHT * 0.10,
             prix_ttc:     devis.totalTTC,
+            distance_km:  distanceKm,
             lignes:       devis.supplements,
             coefficients: {
               saison:   devis.coeffSaisonValue,
