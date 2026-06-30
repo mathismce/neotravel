@@ -20,6 +20,38 @@ function getSupabaseClient() {
   return createClient(supabaseUrl, supabaseKey);
 }
 
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const demandeId = searchParams.get("demande_id");
+
+    if (!demandeId) {
+      return NextResponse.json(
+        { error: "demande_id est requis." },
+        { status: 400 }
+      );
+    }
+
+    const supabase = getSupabaseClient();
+
+    const { data, error } = await supabase
+      .from("demandes")
+      .select("prospect_nom")
+      .eq("id", demandeId)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({ prospect_nom: data?.prospect_nom ?? null });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Impossible de charger la demande.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as RdvBody;

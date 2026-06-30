@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "../../components/Navbar";
 
@@ -11,11 +11,33 @@ function RdvContent() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prospectNom, setProspectNom] = useState<string | null>(null);
   const [form, setForm] = useState({
     date: "",
     time: "",
     canal: "visio",
   });
+
+  useEffect(() => {
+    if (!demandeId) return;
+
+    let cancelled = false;
+
+    fetch(`/api/rdv?demande_id=${encodeURIComponent(demandeId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.prospect_nom) {
+          setProspectNom(data.prospect_nom as string);
+        }
+      })
+      .catch(() => {
+        /* personnalisation optionnelle : on ignore l'échec */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [demandeId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -70,11 +92,12 @@ function RdvContent() {
         <div className="relative z-10 w-full max-w-[560px] rounded-[40px] border border-lime-300/80 bg-[rgba(247,244,236,0.96)] px-6 py-8 shadow-[0_35px_80px_rgba(0,0,0,0.35)] backdrop-blur-sm sm:px-10">
           <div className="text-center">
             <h1 className="text-[clamp(1.8rem,4vw,2.6rem)] font-black tracking-[-0.04em] text-zinc-950">
-              Prendre rendez-vous
+              {prospectNom ? `Prendre rendez-vous, ${prospectNom}` : "Prendre rendez-vous"}
             </h1>
             <p className="mt-2 text-[1.02rem] text-slate-500">
-              Choisissez un créneau avec un commercial pour finaliser votre
-              demande.
+              {prospectNom
+                ? `${prospectNom}, choisissez un créneau avec un commercial pour finaliser votre demande.`
+                : "Choisissez un créneau avec un commercial pour finaliser votre demande."}
             </p>
           </div>
 
@@ -93,7 +116,7 @@ function RdvContent() {
           {submitted ? (
             <div className="mt-8 rounded-md border border-lime-300 bg-lime-50 px-6 py-8 text-center">
               <p className="text-[1.1rem] font-black text-zinc-950">
-                Rendez-vous demandé ✓
+                {prospectNom ? `Merci ${prospectNom}, rendez-vous demandé ✓` : "Rendez-vous demandé ✓"}
               </p>
               <p className="mt-2 text-[0.98rem] text-slate-600">
                 Un commercial vous confirmera le créneau du{" "}
